@@ -27,5 +27,15 @@ else
     kubectl create ns ${WORKLOAD_NS}
 fi
 
+if kubectl get clusterrolebinding privileged-cluster-role-binding ; then
+    echo "privileged-cluster-role-binding already exists"
+else 
+    kubectl create clusterrolebinding privileged-cluster-role-binding \
+        --clusterrole=vmware-system-tmc-psp-privileged \
+        --group=system:authenticated
+fi
+
+
 kapp -y deploy -n kube-system -a cert-manager -f dist/third-party/cert-manager.yaml
+
 kapp -y deploy -n kube-system -a opinion-service -f <(ko resolve -f dist/opinion-service.yaml)
